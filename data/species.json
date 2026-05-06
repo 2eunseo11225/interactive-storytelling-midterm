@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Golden Toad",
+    "year": "1989",
+    "cause": "Climate Change",
+    "desc": "Disappeared due to rising temperatures in Costa Rica.",
+    "media": "media/video1.mp4"
+  },
+  {
+    "name": "Baiji Dolphin",
+    "year": "2006",
+    "cause": "Environmental Degradation",
+    "desc": "Functionally extinct due to habitat destruction.",
+    "media": "media/video2.mp4"
+  }
+]
