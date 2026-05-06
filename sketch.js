@@ -20,7 +20,14 @@ let layout = {};
 // ------------------ 데이터 로딩
 function preload() {
   let data = loadJSON("data/species.json");
-  species = Array.isArray(data) ? data : Object.values(data);
+
+  if (Array.isArray(data)) {
+    species = data;
+  } else if (data.species) {
+    species = data.species;
+  } else {
+    species = Object.values(data);
+  }
 }
 
 // ------------------
@@ -74,6 +81,11 @@ function loadCurrentMedia() {
   }
 
   let path = species[selected].media;
+
+  if (!path) {
+    mediaType = "none";
+    return;
+  }
 
   // 👉 확장자로 타입 판단
   if (path.endsWith(".mp4") || path.endsWith(".webm")) {
