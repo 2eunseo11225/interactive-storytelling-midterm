@@ -3,6 +3,9 @@ let species = [];
 let selected = 0;
 let revealAmount = 0;
 
+let mediaElement;
+let mediaType = "video"; // or "image"
+
 let video;
 let autoTimer = 0;
 const AUTO_DELAY = 600;
@@ -59,13 +62,36 @@ function updateScroll() {
 
 // ------------------ 영상 로딩
 function loadCurrentMedia() {
-  if (video) video.remove();
 
-  video = createVideo(species[selected].media);
-  video.size(600, 350);
-  video.position(layout.leftW + 40, 80);
-  video.loop();
-  video.volume(0);
+  // 기존 요소 제거
+  if (mediaElement) {
+    mediaElement.remove();
+    mediaElement = null;
+  }
+
+  let path = species[selected].media;
+
+  // 👉 확장자로 타입 판단
+  if (path.endsWith(".mp4") || path.endsWith(".webm")) {
+
+    mediaType = "video";
+
+    mediaElement = createVideo(path);
+    mediaElement.size(600, 350);
+    mediaElement.position(layout.leftW + 40, 80);
+    mediaElement.loop();
+    mediaElement.volume(0);
+
+  } else {
+
+    mediaType = "image";
+
+    mediaElement = createImg(path);
+    mediaElement.style("object-fit", "cover");
+    mediaElement.position(layout.leftW + 40, 80);
+
+  }
+}
 }
 
 // ------------------ 레이아웃
