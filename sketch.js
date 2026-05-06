@@ -16,63 +16,98 @@ const itemHeight = 40;
 
 let layout = {};
 
-let dataLoaded = false;
-let dataError = false;
+// ------------------ 데이터 로딩
+function preload() {
+  let data = loadJSON("data/species.json", () => {}, () => {});
+  
+  if (data) {
+    if (Array.isArray(data)) {
+      species = data;
+    } else if (data.species) {
+      species = data.species;
+    } else {
+      species = Object.values(data);
+    }
+  }
+}
 
-// ------------------ 데이터 로딩 (GitHub Pages 안정 방식)
+// ------------------
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
 
-  loadData();
-}
-
-function loadData() {
-  fetch("data/species.json")
-    .then(res => {
-      if (!res.ok) throw new Error("JSON load failed");
-      return res.json();
-    })
-    .then(data => {
-      if (Array.isArray(data)) {
-        species = data;
-      } else if (data.species) {
-        species = data.species;
-      } else {
-        species = Object.values(data);
-      }
-      dataLoaded = true;
-    })
-    .catch(err => {
-      console.error(err);
-      dataError = true;
-    });
+  // 👉 JSON 실패 대비 테스트 데이터
+  if (!species || species.length === 0) {
+    species = [
+  {
+    "name": "Golden Toad",
+    "year": "1989",
+    "cause": "Rapid climate shifts disrupted its cloud forest habitat, leading to breeding failure.",
+    "desc": "A bright orange amphibian once endemic to Costa Rica; became a symbol of climate-linked extinction.",
+    "media": "media/Bufo_periglenes2.jpg"
+  },
+  {
+    "name": "Bramble Cay Melomys",
+    "year": "2016",
+    "cause": "Rising sea levels repeatedly flooded its island habitat.",
+    "desc": "The first mammal declared extinct due to human-induced climate change.",
+    "media": "media/media2.jpg"
+  },
+  {
+    "name": "Pinta Island Tortoise",
+    "year": "2012",
+    "cause": "Habitat degradation worsened by climate shifts and human impact.",
+    "desc": "Known as “Lonesome George,” the last of his species.",
+    "media": "media/media3.mp4"
+  },
+  {
+    "name": "Baiji (Yangtze River Dolphin)",
+    "year": "2006 (functionally extinct)",
+    "cause": "River warming and industrial disruption degraded habitat.",
+    "desc": "One of the few freshwater dolphins; vanished from China’s Yangtze River.",
+    "media": "media/media4.jpg"
+  },
+  {
+    "name": "Christmas Island Pipistrelle",
+    "year": "2009",
+    "cause": "Climate shifts altered insect availability and habitat balance.",
+    "desc": "Disappeared rapidly despite last-minute conservation efforts.",
+    "media": "media/media5.jpg"
+  },
+  {
+    "name": "Great Auk",
+    "year": "1844",
+    "cause": "Overhunting combined with climate-driven habitat shifts.",
+    "desc": "Flightless seabird often compared to penguins.",
+    "media": "media/media6.jpeg"
+  },
+  {
+    "name": "Caribbean Monk Seal",
+    "year": "1952",
+    "cause": "Ocean warming and overexploitation reduced food supply.",
+    "desc": "The only seal native to the Caribbean.",
+    "media": "media/media7.jpg"
+  },
+  {
+    "name": "St. Helena Olive",
+    "year": "2003",
+    "cause": "Climate shifts and habitat loss prevented regeneration.",
+    "desc": "Last tree died despite conservation attempts.",
+    "media": "media/media8.jpeg"
+  }
+]
+  }
 }
 
 // ------------------
 function draw() {
   background(10);
 
-  // ❗ 로딩 중
-  if (!dataLoaded && !dataError) {
+  // ❗ 데이터 없으면 종료
+  if (!species || species.length === 0) {
     fill(200);
     textSize(20);
-    text("Loading...", 50, 50);
-    return;
-  }
-
-  // ❗ 로딩 실패
-  if (dataError) {
-    fill(255, 100, 100);
-    textSize(18);
-    text("Failed to load data/species.json", 50, 50);
-    return;
-  }
-
-  // ❗ 데이터 없음
-  if (species.length === 0) {
-    fill(200);
-    text("No species data", 50, 50);
+    text("No data loaded", 50, 50);
     return;
   }
 
@@ -90,6 +125,8 @@ function draw() {
 
 // ------------------ 자동 재생
 function handleAutoPlay() {
+  if (!species || species.length === 0) return;
+
   autoTimer++;
   if (autoTimer > AUTO_DELAY) {
     selected = (selected + 1) % species.length;
@@ -108,7 +145,7 @@ function updateScroll() {
   scrollOffset += (targetScroll - scrollOffset) * 0.08;
 }
 
-// ------------------ 미디어
+// ------------------ 미디어 로딩
 function loadCurrentMedia() {
 
   if (!species[selected]) return;
@@ -158,6 +195,7 @@ function drawLayout() {
   stroke(80);
   line(leftW, 0, leftW, height);
 
+  // 헤더
   noStroke();
   fill(20);
   rect(0, 0, leftW, layout.headerH);
@@ -180,7 +218,9 @@ function drawList() {
     for (let i = 0; i < total; i++) {
       let y = (i + loop * total) * itemHeight;
 
-      fill(i === selected ? 220 : 120);
+      if (i === selected) fill(220);
+      else fill(120);
+
       text((i + 1) + ". " + species[i].name, 20, y);
     }
   }
@@ -203,6 +243,7 @@ function drawDetail() {
   stroke(200);
   rect(x, y, boxW, boxH);
 
+  // 👉 미디어 없을 때 표시
   if (mediaType === "none") {
     fill(120);
     noStroke();
