@@ -34,6 +34,11 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
+
+  species = [
+    { name: "A", year: "2000", cause: "Test", desc: "Hello" },
+    { name: "B", year: "2001", cause: "Test", desc: "World" }
+  ];
 }
 
 function draw() {
