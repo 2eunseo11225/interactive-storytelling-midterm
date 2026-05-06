@@ -16,45 +16,63 @@ const itemHeight = 40;
 
 let layout = {};
 
-// ------------------ 데이터 로딩
-function preload() {
-  let data = loadJSON("data/species.json", () => {}, () => {});
-  
-  if (data) {
-    if (Array.isArray(data)) {
-      species = data;
-    } else if (data.species) {
-      species = data.species;
-    } else {
-      species = Object.values(data);
-    }
-  }
-}
+let dataLoaded = false;
+let dataError = false;
 
-// ------------------
+// ------------------ 데이터 로딩 (GitHub Pages 안정 방식)
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
 
-  // 👉 JSON 실패 대비 테스트 데이터
-  if (!species || species.length === 0) {
-    species = [
-      { name: "A", year: "2000", cause: "Test", desc: "Hello world" },
-      { name: "B", year: "2001", cause: "Test", desc: "Another entry" },
-      { name: "C", year: "2002", cause: "Test", desc: "More data here" }
-    ];
-  }
+  loadData();
+}
+
+function loadData() {
+  fetch("data/species.json")
+    .then(res => {
+      if (!res.ok) throw new Error("JSON load failed");
+      return res.json();
+    })
+    .then(data => {
+      if (Array.isArray(data)) {
+        species = data;
+      } else if (data.species) {
+        species = data.species;
+      } else {
+        species = Object.values(data);
+      }
+      dataLoaded = true;
+    })
+    .catch(err => {
+      console.error(err);
+      dataError = true;
+    });
 }
 
 // ------------------
 function draw() {
   background(10);
 
-  // ❗ 데이터 없으면 종료
-  if (!species || species.length === 0) {
+  // ❗ 로딩 중
+  if (!dataLoaded && !dataError) {
     fill(200);
     textSize(20);
-    text("No data loaded", 50, 50);
+    text("Loading...", 50, 50);
+    return;
+  }
+
+  // ❗ 로딩 실패
+  if (dataError) {
+    fill(255, 100, 100);
+    textSize(18);
+    text("Failed to load data/species.json", 50, 50);
+    return;
+  }
+
+  // ❗ 데이터 없음
+  if (species.length === 0) {
+    fill(200);
+    text("No species data", 50, 50);
     return;
   }
 
@@ -72,8 +90,6 @@ function draw() {
 
 // ------------------ 자동 재생
 function handleAutoPlay() {
-  if (!species || species.length === 0) return;
-
   autoTimer++;
   if (autoTimer > AUTO_DELAY) {
     selected = (selected + 1) % species.length;
@@ -92,7 +108,7 @@ function updateScroll() {
   scrollOffset += (targetScroll - scrollOffset) * 0.08;
 }
 
-// ------------------ 미디어 로딩
+// ------------------ 미디어
 function loadCurrentMedia() {
 
   if (!species[selected]) return;
@@ -142,7 +158,6 @@ function drawLayout() {
   stroke(80);
   line(leftW, 0, leftW, height);
 
-  // 헤더
   noStroke();
   fill(20);
   rect(0, 0, leftW, layout.headerH);
@@ -165,9 +180,7 @@ function drawList() {
     for (let i = 0; i < total; i++) {
       let y = (i + loop * total) * itemHeight;
 
-      if (i === selected) fill(220);
-      else fill(120);
-
+      fill(i === selected ? 220 : 120);
       text((i + 1) + ". " + species[i].name, 20, y);
     }
   }
@@ -190,7 +203,6 @@ function drawDetail() {
   stroke(200);
   rect(x, y, boxW, boxH);
 
-  // 👉 미디어 없을 때 표시
   if (mediaType === "none") {
     fill(120);
     noStroke();
