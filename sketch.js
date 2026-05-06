@@ -3,10 +3,9 @@ let species = [];
 let selected = 0;
 let revealAmount = 0;
 
-let mediaElement;
-let mediaType = "video"; // or "image"
+let mediaElement = null;
+let mediaType = "none";
 
-let video;
 let autoTimer = 0;
 const AUTO_DELAY = 600;
 
@@ -19,14 +18,16 @@ let layout = {};
 
 // ------------------ 데이터 로딩
 function preload() {
-  let data = loadJSON("data/species.json");
-
-  if (Array.isArray(data)) {
-    species = data;
-  } else if (data.species) {
-    species = data.species;
-  } else {
-    species = Object.values(data);
+  let data = loadJSON("data/species.json", () => {}, () => {});
+  
+  if (data) {
+    if (Array.isArray(data)) {
+      species = data;
+    } else if (data.species) {
+      species = data.species;
+    } else {
+      species = Object.values(data);
+    }
   }
 }
 
@@ -35,14 +36,27 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
 
-  species = [
-    { name: "A", year: "2000", cause: "Test", desc: "Hello" },
-    { name: "B", year: "2001", cause: "Test", desc: "World" }
-  ];
+  // 👉 JSON 실패 대비 테스트 데이터
+  if (!species || species.length === 0) {
+    species = [
+      { name: "A", year: "2000", cause: "Test", desc: "Hello world" },
+      { name: "B", year: "2001", cause: "Test", desc: "Another entry" },
+      { name: "C", year: "2002", cause: "Test", desc: "More data here" }
+    ];
+  }
 }
 
+// ------------------
 function draw() {
   background(10);
+
+  // ❗ 데이터 없으면 종료
+  if (!species || species.length === 0) {
+    fill(200);
+    textSize(20);
+    text("No data loaded", 50, 50);
+    return;
+  }
 
   handleAutoPlay();
   updateScroll();
@@ -51,13 +65,15 @@ function draw() {
   drawList();
   drawDetail();
 
-  if (!mediaElement && species.length > 0) {
-  loadCurrentMedia();
-}
+  if (!mediaElement) {
+    loadCurrentMedia();
+  }
 }
 
 // ------------------ 자동 재생
 function handleAutoPlay() {
+  if (!species || species.length === 0) return;
+
   autoTimer++;
   if (autoTimer > AUTO_DELAY) {
     selected = (selected + 1) % species.length;
@@ -76,10 +92,11 @@ function updateScroll() {
   scrollOffset += (targetScroll - scrollOffset) * 0.08;
 }
 
-// ------------------ 영상 로딩
+// ------------------ 미디어 로딩
 function loadCurrentMedia() {
 
-  // 기존 요소 제거
+  if (!species[selected]) return;
+
   if (mediaElement) {
     mediaElement.remove();
     mediaElement = null;
@@ -92,7 +109,6 @@ function loadCurrentMedia() {
     return;
   }
 
-  // 👉 확장자로 타입 판단
   if (path.endsWith(".mp4") || path.endsWith(".webm")) {
 
     mediaType = "video";
@@ -108,12 +124,11 @@ function loadCurrentMedia() {
     mediaType = "image";
 
     mediaElement = createImg(path);
+    mediaElement.size(600, 350);
     mediaElement.style("object-fit", "cover");
     mediaElement.position(layout.leftW + 40, 80);
-
   }
 }
-
 
 // ------------------ 레이아웃
 function drawLayout() {
@@ -137,7 +152,7 @@ function drawLayout() {
   text("EXTINCT SPECIES ARCHIVE", 20, 35);
 }
 
-// ------------------ 리스트 (무한)
+// ------------------ 리스트
 function drawList() {
   let startY = layout.headerH + 20;
   let total = species.length;
@@ -162,6 +177,9 @@ function drawList() {
 
 // ------------------ 상세
 function drawDetail() {
+
+  if (!species[selected]) return;
+
   let x = layout.leftW + 40;
   let y = 80;
 
@@ -172,6 +190,15 @@ function drawDetail() {
   stroke(200);
   rect(x, y, boxW, boxH);
 
+  // 👉 미디어 없을 때 표시
+  if (mediaType === "none") {
+    fill(120);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    text("NO MEDIA", x + boxW / 2, y + boxH / 2);
+    textAlign(LEFT, BASELINE);
+  }
+
   let s = species[selected];
 
   push();
@@ -180,13 +207,14 @@ function drawDetail() {
   fill(255 * revealAmount);
 
   textSize(26);
-  text(s.name, 0, 0);
+  text(s.name || "Unknown", 0, 0);
 
   textSize(14);
-  text("Extinct: " + s.year, 0, 30);
-  text("Cause: " + s.cause, 0, 55);
+  text("Extinct: " + (s.year || "-"), 0, 30);
+  text("Cause: " + (s.cause || "-"), 0, 55);
 
-  let partial = s.desc.substring(0, floor(s.desc.length * revealAmount));
+  let desc = s.desc || "";
+  let partial = desc.substring(0, floor(desc.length * revealAmount));
   text(partial, 0, 90, boxW);
 
   pop();
@@ -223,9 +251,9 @@ function mousePressed() {
 
 // ------------------ 휠
 function mouseWheel(event) {
-  targetScroll += event.delta * 0.5;
-
   let totalHeight = species.length * itemHeight;
+
+  targetScroll += event.delta * 0.5;
 
   if (targetScroll < 0) targetScroll += totalHeight;
   if (targetScroll > totalHeight) targetScroll -= totalHeight;
