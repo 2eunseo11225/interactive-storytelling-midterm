@@ -19,14 +19,14 @@ let layout = {};
 
 // ------------------ 데이터 로딩
 function preload() {
-  species = loadJSON("data/species.json");
+  let data = loadJSON("data/species.json");
+  species = Array.isArray(data) ? data : Object.values(data);
 }
 
 // ------------------
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont('monospace');
-  loadCurrentMedia();
 }
 
 function draw() {
@@ -38,6 +38,10 @@ function draw() {
   drawLayout();
   drawList();
   drawDetail();
+
+  if (!mediaElement && species.length > 0) {
+  loadCurrentMedia();
+}
 }
 
 // ------------------ 자동 재생
@@ -92,7 +96,7 @@ function loadCurrentMedia() {
 
   }
 }
-}
+
 
 // ------------------ 레이아웃
 function drawLayout() {
