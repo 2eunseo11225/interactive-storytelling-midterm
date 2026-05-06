@@ -2,15 +2,57 @@
   {
     "name": "Golden Toad",
     "year": "1989",
-    "cause": "Climate Change",
-    "desc": "Disappeared due to rising temperatures in Costa Rica.",
+    "cause": "Rapid climate shifts disrupted its cloud forest habitat, leading to breeding failure.",
+    "desc": "A bright orange amphibian once endemic to Costa Rica; became a symbol of climate-linked extinction.",
     "media": "media/video1.mp4"
   },
   {
-    "name": "Baiji Dolphin",
-    "year": "2006",
-    "cause": "Environmental Degradation",
-    "desc": "Functionally extinct due to habitat destruction.",
+    "name": "Bramble Cay Melomys",
+    "year": "2016",
+    "cause": "Rising sea levels repeatedly flooded its island habitat.",
+    "desc": "The first mammal declared extinct due to human-induced climate change.",
     "media": "media/video2.mp4"
+  },
+  {
+    "name": "Pinta Island Tortoise",
+    "year": "2012",
+    "cause": "Habitat degradation worsened by climate shifts and human impact.",
+    "desc": "Known as “Lonesome George,” the last of his species.",
+    "media": "media/video3.mp4"
+  },
+  {
+    "name": "Baiji (Yangtze River Dolphin)",
+    "year": "2006 (functionally extinct)",
+    "cause": "River warming and industrial disruption degraded habitat.",
+    "desc": "One of the few freshwater dolphins; vanished from China’s Yangtze River.",
+    "media": "media/video4.mp4"
+  },
+  {
+    "name": "Christmas Island Pipistrelle",
+    "year": "2009",
+    "cause": "Climate shifts altered insect availability and habitat balance.",
+    "desc": "Disappeared rapidly despite last-minute conservation efforts.",
+    "media": "media/video5.mp4"
+  },
+  {
+    "name": "Great Auk",
+    "year": "1844",
+    "cause": "Overhunting combined with climate-driven habitat shifts.",
+    "desc": "Flightless seabird often compared to penguins.",
+    "media": "media/video6.mp4"
+  },
+  {
+    "name": "Caribbean Monk Seal",
+    "year": "1952",
+    "cause": "Ocean warming and overexploitation reduced food supply.",
+    "desc": "The only seal native to the Caribbean.",
+    "media": "media/video7.mp4"
+  },
+  {
+    "name": "St. Helena Olive",
+    "year": "2003",
+    "cause": "Climate shifts and habitat loss prevented regeneration.",
+    "desc": "Last tree died despite conservation attempts.",
+    "media": "media/video8.mp4"
   }
 ]
